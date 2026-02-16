@@ -82,6 +82,7 @@ export default function AddBookmarkForm({ userId, onAdd }: Props) {
     if (data) {
       onAdd(data as Bookmark)
       setUrl('')
+      setTitle('')
       inputRef.current?.focus()
     }
   }
