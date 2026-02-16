@@ -17,7 +17,12 @@ export default function BookmarksDashboard({ user, initialBookmarks }: Props) {
   const supabase = createClient()
 
   useEffect(() => {
-    const channel = supabase
+    let channelRef: ReturnType<typeof supabase.channel> | null = null
+
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session) supabase.realtime.setAuth(session.access_token)
+
+     channelRef = supabase
       .channel(`bookmarks-${user.id}-${Date.now()}`)
       .on(
         'postgres_changes',
@@ -48,8 +53,9 @@ export default function BookmarksDashboard({ user, initialBookmarks }: Props) {
         if (status === 'SUBSCRIBED') setRealtimeStatus('connected')
         else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setRealtimeStatus('error')
       })
+  })
   
-    return () => { channel.unsubscribe() }
+    return () => { channelRef?.unsubscribe() }
   }, [user.id])
 
   const handleAdd = useCallback((bookmark: Bookmark) => {
