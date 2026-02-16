@@ -2,7 +2,7 @@
 
 A private, real-time bookmark manager built with Next.js 14 (App Router), Supabase, and Tailwind CSS.
 
-**Live URL:** 
+**Live URL:** https://bookmarks-flax-one.vercel.app/
 
 ---
 
@@ -173,6 +173,13 @@ After deploying, add your Vercel URL to:
 **Issue:** Supabase Realtime requires RLS policies to be set correctly, or the real-time channel won't receive events even if the subscription connects.
 
 **Solution:** Ensure the `bookmarks` table has a `SELECT` policy that allows `auth.uid() = user_id`, and that `supabase_realtime` publication includes the table. The client-side filter (`filter: 'user_id=eq.${userId}'`) further narrows events, but the RLS policy is what actually controls server-side access.
+
+
+### Problem 4: INSERT events not broadcasting in other tabs 
+
+**Issue:** DELETE worked across tabs in real-time but INSERT did not
+
+**Solution:** Call supabase.realtime.setAuth(session.access_token) before subscribing to the channel, passing the user's JWT so Supabase can verify the RLS SELECT policy before broadcasting INSERT events.
 
 
 ## Project Structure
