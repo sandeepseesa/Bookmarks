@@ -17,6 +17,10 @@ export default function BookmarksDashboard({ user, initialBookmarks }: Props) {
   const supabase = createClient()
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) supabase.realtime.setAuth(session.access_token)
+    })
+  
     const channel = supabase
       .channel(`bookmarks-${user.id}-${Date.now()}`)
       .on(
